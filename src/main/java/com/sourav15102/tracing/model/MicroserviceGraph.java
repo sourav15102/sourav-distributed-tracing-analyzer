@@ -1,4 +1,4 @@
-package com.yourgithubusername.tracing.model;
+package com.sourav15102.tracing.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

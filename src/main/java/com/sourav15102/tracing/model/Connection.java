@@ -1,4 +1,4 @@
-package com.yourgithubusername.tracing.model;
+package com.sourav15102.tracing.model;
 import java.lang.*;
 import java.util.Objects;
 
@@ -6,7 +6,7 @@ public class Connection {
     private String destination;
     private int latency;
 
-    Connection(String destination, int latency){
+    public Connection(String destination, int latency){
         this.destination = destination;
         this.latency = latency;
     }
