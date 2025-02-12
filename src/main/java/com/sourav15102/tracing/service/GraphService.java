@@ -33,6 +33,44 @@ public class GraphService {
         return count;
     }
 
+    private int dijAlgo(String start, String end) {
+        if (!graph.containsNode(start) || !graph.containsNode(end)) return -1;
+
+        // Min-Heap to store nodes with their shortest distance found so far
+        PriorityQueue<Connection> minHeap = new PriorityQueue<>(Comparator.comparingInt(Connection::getLatency));
+        Map<String, Integer> shortestDistances = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+
+        // Initialize distances
+        shortestDistances.put(start, 0);
+        minHeap.add(new Connection(start, 0));
+
+        while (!minHeap.isEmpty()) {
+            Connection current = minHeap.poll();
+            String currentNode = current.getDestination();
+
+            // If we reach the target node, return the shortest distance
+            if (currentNode.equals(end)) return shortestDistances.get(currentNode);
+
+            // If the node was already processed, skip it
+            if (visited.contains(currentNode)) continue;
+            visited.add(currentNode);
+
+            // Explore neighbors
+            for (Connection neighbor : graph.getEdges(currentNode)) {
+                if (visited.contains(neighbor.getDestination())) continue;
+
+                int newDistance = shortestDistances.get(currentNode) + neighbor.getLatency();
+                if (newDistance < shortestDistances.getOrDefault(neighbor.getDestination(), Integer.MAX_VALUE)) {
+                    shortestDistances.put(neighbor.getDestination(), newDistance);
+                    minHeap.add(new Connection(neighbor.getDestination(), newDistance));
+                }
+            }
+        }
+
+        return -1; // No path found
+    }
+
     // Implementing Q1-Q5: Compute total latency for a given trace
     public int getTraceLatency(List<String> path) {
         int totalLatency = 0;
@@ -66,9 +104,19 @@ public class GraphService {
         return dfsExactHops(start, end, exactHops, 0);
     }
 
-    // Find the Shortest Path (Q8-Q9)
+    // Q8-Q9: Find the shortest path using Dijkstra’s Algorithm
     public int findShortestPath(String start, String end) {
-        return -1; // Placeholder
+        int shortestPath = Integer.MAX_VALUE;
+        boolean found = false;
+        int temp;
+        for (Connection neighbor : graph.getEdges(start)) {
+            temp = dijAlgo(neighbor.getDestination(), end);
+            if(temp!=-1){
+                found = true;
+                shortestPath = Math.min(shortestPath, temp+neighbor.getLatency());
+            }
+        }
+        return found?shortestPath:-1;
     }
 
     // Count Different Cycles Within a Max Latency (Q10)

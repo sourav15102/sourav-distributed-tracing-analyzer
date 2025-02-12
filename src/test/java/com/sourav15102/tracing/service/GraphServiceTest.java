@@ -72,4 +72,36 @@ public class GraphServiceTest {
         assertEquals(3, service.countPathsWithExactHops("A", "C", 4)); // Expected: A->B->C->D->C, A->D->C->D->C, A->D->E->B->C
         assertEquals(1, service.countPathsWithExactHops("A", "E", 2)); // No direct two-hop path
     }
+
+    @Test
+    public void testFindShortestPath_validPaths() {
+        MicroserviceGraph graph = new MicroserviceGraph();
+        graph.addEdge("A", "B", 5);
+        graph.addEdge("B", "C", 4);
+        graph.addEdge("A", "C", 9);
+        graph.addEdge("C", "D", 8);
+        graph.addEdge("D", "C", 8);
+        graph.addEdge("D", "E", 6);
+        graph.addEdge("A", "D", 5);
+        graph.addEdge("C", "E", 2);
+        graph.addEdge("E", "B", 3);
+        graph.addEdge("A", "E", 7);
+
+        GraphService service = new GraphService(graph);
+
+        assertEquals(9, service.findShortestPath("A", "C")); // Expected: A -> B -> C (5 + 4 = 9)
+        assertEquals(9, service.findShortestPath("B", "B")); // Expected: B -> C -> E -> B (4 + 2 + 3 = 9)
+    }
+
+    @Test
+    public void testFindShortestPath_noPathExists() {
+        MicroserviceGraph graph = new MicroserviceGraph();
+        graph.addEdge("A", "B", 5);
+        graph.addEdge("B", "C", 4);
+
+        GraphService service = new GraphService(graph);
+
+        assertEquals(-1, service.findShortestPath("C", "A")); // No reverse path from C to A
+        assertEquals(-1, service.findShortestPath("D", "E")); // D and E are not connected
+    }
 }
