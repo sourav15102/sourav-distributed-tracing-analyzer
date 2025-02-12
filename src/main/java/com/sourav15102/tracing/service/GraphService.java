@@ -1,4 +1,5 @@
 package com.sourav15102.tracing.service;
+import com.sourav15102.tracing.model.Connection;
 import com.sourav15102.tracing.model.MicroserviceGraph;
 
 import java.util.*;
@@ -10,9 +11,27 @@ public class GraphService {
         this.graph = graph;
     }
 
-    // Get Total Average Latency for Given Trace (Q1-Q5)
+    // Implementing Q1-Q4: Compute total latency for a given trace
     public int getTraceLatency(List<String> path) {
-        return 9; // Placeholder
+        int totalLatency = 0;
+
+        for (int i = 0; i < path.size() - 1; i++) {
+            String current = path.get(i);
+            String next = path.get(i + 1);
+            boolean found = false;
+
+            for (Connection connection : graph.getEdges(current)) {
+                if (connection.getDestination().equals(next)) {
+                    totalLatency += connection.getLatency();
+                    found = true;
+                     break;
+                }
+            }
+
+            if (!found) return -1; // If any step in the path is missing, return NO SUCH TRACE (-1)
+        }
+
+        return totalLatency;
     }
 
     // Count Paths with Constraints (Q6-Q7)
