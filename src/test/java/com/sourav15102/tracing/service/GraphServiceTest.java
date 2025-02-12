@@ -34,4 +34,42 @@ public class GraphServiceTest {
         assertEquals(-1, service.getTraceLatency(Arrays.asList("A", "C"))); // No direct path from A to C
         assertEquals(-1, service.getTraceLatency(Arrays.asList("C", "A"))); // C -> A does not exist
     }
+
+    @Test
+    public void testCountPathsWithMaxHops() {
+        MicroserviceGraph graph = new MicroserviceGraph();
+        graph.addEdge("A", "B", 5);
+        graph.addEdge("A", "D", 5);
+        graph.addEdge("A", "E", 7);
+        graph.addEdge("C", "D", 8);
+        graph.addEdge("D", "C", 8);
+        graph.addEdge("D", "E", 6);
+        graph.addEdge("C", "E", 2);
+        graph.addEdge("E", "B", 3);
+        graph.addEdge("B", "C", 4);
+
+        GraphService service = new GraphService(graph);
+
+        assertEquals(2, service.countPathsWithMaxHops("C", "C", 3)); // Expected: C-D-C and C-E-B-C
+        assertEquals(0, service.countPathsWithMaxHops("A", "C", 3)); // No paths from A to C
+    }
+
+    @Test
+    public void testCountPathsWithExactHops() {
+        MicroserviceGraph graph = new MicroserviceGraph();
+        graph.addEdge("A", "B", 5);
+        graph.addEdge("A", "D", 5);
+        graph.addEdge("A", "E", 7);
+        graph.addEdge("C", "D", 8);
+        graph.addEdge("D", "C", 8);
+        graph.addEdge("D", "E", 6);
+        graph.addEdge("C", "E", 2);
+        graph.addEdge("E", "B", 3);
+        graph.addEdge("B", "C", 4);
+
+        GraphService service = new GraphService(graph);
+
+        assertEquals(3, service.countPathsWithExactHops("A", "C", 4)); // Expected: A->B->C->D->C, A->D->C->D->C, A->D->E->B->C
+        assertEquals(1, service.countPathsWithExactHops("A", "E", 2)); // No direct two-hop path
+    }
 }

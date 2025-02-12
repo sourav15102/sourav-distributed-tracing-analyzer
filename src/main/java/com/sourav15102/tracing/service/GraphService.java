@@ -11,7 +11,29 @@ public class GraphService {
         this.graph = graph;
     }
 
-    // Implementing Q1-Q4: Compute total latency for a given trace
+    private int dfsMaxHops(String current, String end, int maxHops, int hops) {
+        if (hops > maxHops) return 0;
+        if (current.equals(end) && hops > 0) return 1; // Found a valid path
+
+        int count = 0;
+        for (Connection connection : graph.getEdges(current)) {
+            count += dfsMaxHops(connection.getDestination(), end, maxHops, hops + 1);
+        }
+        return count;
+    }
+
+    private int dfsExactHops(String current, String end, int exactHops, int hops) {
+        if (hops > exactHops) return 0;
+        if (hops == exactHops) return current.equals(end) ? 1 : 0;
+
+        int count = 0;
+        for (Connection connection : graph.getEdges(current)) {
+            count += dfsExactHops(connection.getDestination(), end, exactHops, hops + 1);
+        }
+        return count;
+    }
+
+    // Implementing Q1-Q5: Compute total latency for a given trace
     public int getTraceLatency(List<String> path) {
         int totalLatency = 0;
 
@@ -34,9 +56,14 @@ public class GraphService {
         return totalLatency;
     }
 
-    // Count Paths with Constraints (Q6-Q7)
-    public int countPathsWithConstraints(String start, String end, int maxHops, boolean exactHops) {
-        return 0; // Placeholder
+    // Q6: Count paths with at most maxHops
+    public int countPathsWithMaxHops(String start, String end, int maxHops) {
+        return dfsMaxHops(start, end, maxHops, 0);
+    }
+
+    // Q7: Count paths with exactly exactHops
+    public int countPathsWithExactHops(String start, String end, int exactHops) {
+        return dfsExactHops(start, end, exactHops, 0);
     }
 
     // Find the Shortest Path (Q8-Q9)
