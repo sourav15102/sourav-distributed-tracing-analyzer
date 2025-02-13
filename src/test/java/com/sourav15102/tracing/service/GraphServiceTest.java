@@ -104,4 +104,36 @@ public class GraphServiceTest {
         assertEquals(-1, service.findShortestPath("C", "A")); // No reverse path from C to A
         assertEquals(-1, service.findShortestPath("D", "E")); // D and E are not connected
     }
+
+    @Test
+    public void testCountCyclesWithMaxLatency_validCycles() {
+        MicroserviceGraph graph = new MicroserviceGraph();
+        graph.addEdge("A", "B", 5);
+        graph.addEdge("B", "C", 4);
+        graph.addEdge("C", "D", 8);
+        graph.addEdge("D", "C", 8);
+        graph.addEdge("D", "E", 6);
+        graph.addEdge("A", "D", 5);
+        graph.addEdge("C", "E", 2);
+        graph.addEdge("E", "B", 3);
+        graph.addEdge("A", "E", 7);
+
+        GraphService service = new GraphService(graph);
+
+        assertEquals(7, service.countCyclesWithMaxLatency("C", "C",30)); // Expected: 7 valid cycles
+        assertEquals(2, service.countCyclesWithMaxLatency("D", "D", 22)); // Expected: 2 valid cycles
+        assertEquals(1, service.countCyclesWithMaxLatency("D", "D", 20)); // Expected: 1 valid cycles
+    }
+
+    @Test
+    public void testCountCyclesWithMaxLatency_noCycles() {
+        MicroserviceGraph graph = new MicroserviceGraph();
+        graph.addEdge("A", "B", 5);
+        graph.addEdge("B", "C", 4);
+
+        GraphService service = new GraphService(graph);
+
+        assertEquals(0, service.countCyclesWithMaxLatency("A", "A",10)); // No cycles possible
+        assertEquals(0, service.countCyclesWithMaxLatency("C", "C",20)); // No cycles possible
+    }
 }

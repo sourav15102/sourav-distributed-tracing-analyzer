@@ -71,6 +71,24 @@ public class GraphService {
         return -1; // No path found
     }
 
+    private int dfsCountCycles(String start, String end, int maxLatency, int currentLatency) {
+        // Stop exploring this path if the latency exceeds the max limit
+        int count = 0;
+        if (currentLatency >= maxLatency) return 0;
+        if(start.equals(end)){
+            count = 1;
+        }
+
+        for (Connection connection : graph.getEdges(start)) {
+            int newLatency = currentLatency + connection.getLatency();
+
+            // Continue DFS without marking nodes as visited
+            count += dfsCountCycles(connection.getDestination(), end, maxLatency, newLatency);
+        }
+
+        return count;
+    }
+
     // Implementing Q1-Q5: Compute total latency for a given trace
     public int getTraceLatency(List<String> path) {
         int totalLatency = 0;
@@ -119,9 +137,13 @@ public class GraphService {
         return found?shortestPath:-1;
     }
 
-    // Count Different Cycles Within a Max Latency (Q10)
-    public int countCyclesWithMaxLatency(String node, int maxLatency) {
-        return 0; // Placeholder
+    // Q10: Count different cycles that start and end at `node` within `maxLatency`
+    public int countCyclesWithMaxLatency(String start, String end, int maxLatency) {
+        int count = 0;
+        for (Connection connection : graph.getEdges(start)) {
+            count += dfsCountCycles(connection.getDestination(), end, maxLatency, connection.getLatency());
+        }
+        return count;
     }
 }
 
