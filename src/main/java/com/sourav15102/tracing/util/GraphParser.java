@@ -1,26 +1,33 @@
 package com.sourav15102.tracing.util;
-import com.sourav15102.tracing.model.MicroserviceGraph;
 
+import com.sourav15102.tracing.model.MicroserviceGraph;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GraphParser {
-    public static MicroserviceGraph parseGraph(String filePath) throws IOException {
-        MicroserviceGraph graph = new MicroserviceGraph();
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+    public static List<MicroserviceGraph> readGraphs(String filePath) throws IOException {
+        List<MicroserviceGraph> graphs = new ArrayList<>();
 
-        String line = reader.readLine();
-        while (line != null) {
-            String[] parts = line.split(",\\s*");
-            for (String part : parts) {
-                String from = part.substring(0, 1);
-                String to = part.substring(1, 2);
-                int latency = Integer.parseInt(part.substring(2));
+        // Read all lines from the input file (each line is a separate graph)
+        List<String> lines = Files.readAllLines(Paths.get(filePath));
+
+        for (String line : lines) {
+            MicroserviceGraph graph = new MicroserviceGraph();
+            String[] edges = line.split(",\\s*");
+
+            for (String edge : edges) {
+                String from = edge.substring(0, 1);  // First character is the 'from' node
+                String to = edge.substring(1, 2);    // Second character is the 'to' node
+                int latency = Integer.parseInt(edge.substring(2)); // Remaining characters represent latency
                 graph.addEdge(from, to, latency);
             }
-            line = reader.readLine();
+
+            graphs.add(graph);
         }
 
-        reader.close();
-        return graph;
+        return graphs;
     }
 }

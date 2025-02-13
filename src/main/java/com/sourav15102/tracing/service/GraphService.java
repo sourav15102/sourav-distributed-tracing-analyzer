@@ -142,7 +142,7 @@ public class GraphService {
         return found?shortestPath:-1;
     }
 
-    // Q10: Count different cycles that start and end at `node` within `maxLatency`
+    // Q10: Count different path from start to end within `maxLatency`
     public int countCyclesWithMaxLatency(String start, String end, int maxLatency) {
         int count = 0;
         for (Connection connection : graph.getEdges(start)) {
