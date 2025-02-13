@@ -88,9 +88,8 @@ public class GraphService {
 
         return count;
     }
-
-    // Implementing Q1-Q5: Compute total latency for a given trace
-    public int getTraceLatency(List<String> path) {
+    // Utility method for tracing requests and calculate average latency
+    public int getAverageLatency(List<String> path) {
         int totalLatency = 0;
 
         for (int i = 0; i < path.size() - 1; i++) {
@@ -102,7 +101,7 @@ public class GraphService {
                 if (connection.getDestination().equals(next)) {
                     totalLatency += connection.getLatency();
                     found = true;
-                     break;
+                    break;
                 }
             }
 
@@ -110,6 +109,12 @@ public class GraphService {
         }
 
         return totalLatency;
+    }
+
+    // Implementing Q1-Q5: Compute total latency for a given trace
+    public String getTraceLatency(List<String> path) {
+        int totalLatency = getAverageLatency(path);
+        return totalLatency==-1?"NO SUCH TRACE":Integer.toString(totalLatency);
     }
 
     // Q6: Count paths with at most maxHops
